@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-accent="indigo" data-density="comfy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paperlens | Research intelligence workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<script>
+(function(){var d=document.documentElement,g=function(k,f){try{return localStorage.getItem(k)||f}catch(e){return f}};
+var m=g('pl-mode','auto'),t=m==='auto'?(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):m;
+d.dataset.theme=t;d.dataset.accent=g('pl-accent','indigo');d.dataset.density=g('pl-density','comfy');d.style.setProperty('--fs',g('pl-fs','15')+'px')})();
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="app" id="app">
+
+  <aside class="side" id="side">
+    <div class="brand"><span class="lens" aria-hidden="true"></span><div><b>Paperlens</b><small>Research workspace</small></div></div>
+
+    <button class="cmdk-trigger" id="cmdkOpen" aria-label="Open command palette"><span data-ico="search"></span><span>Search or jump to</span><kbd>Ctrl K</kbd></button>
+
+    <nav aria-label="Main">
+      <div class="nav-group">Workspace</div>
+      <button data-view="home" data-ico="home" class="on">Dashboard</button>
+      <button data-view="library" data-ico="book">Library <span id="count" class="pill">0</span></button>
+      <button data-view="board" data-ico="kanban">Reading board</button>
+      <button data-view="map" data-ico="network">Knowledge map</button>
+      <div class="nav-group">Intelligence</div>
+      <button data-view="ask" data-ico="chat">Ask your papers</button>
+      <button data-view="compare" data-ico="cols">Compare</button>
+      <button data-view="review" data-ico="doc">Literature review</button>
+      <div class="nav-group">Tools</div>
+      <button data-view="cite" data-ico="quote">Citations</button>
+      <button data-view="notes" data-ico="pen">Notes</button>
+      <button data-view="upload" data-ico="upload">Add papers</button>
+      <button data-view="discover" data-ico="globe">Find papers</button>
+      <button data-view="pipeline" data-ico="cpu">How it works</button>
+    </nav>
+
+    <div class="sys" id="sys"></div>
+    <div class="side-foot">
+      <a class="btn gold block" id="dlAll" href="/api/download-all"><span data-ico="download"></span>Download all papers</a>
+      <div class="foot-row">
+        <button class="iconbtn" id="modeBtn" aria-label="Switch light or dark theme" title="Theme"></button>
+        <button class="iconbtn" id="setBtn" aria-label="Open settings" title="Settings" data-ico="sliders"></button>
+        <button class="iconbtn" id="keysBtn" aria-label="Keyboard shortcuts" title="Shortcuts (?)" data-ico="keyboard"></button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="shell">
+    <header class="topbar">
+      <button class="iconbtn menu" id="menuBtn" aria-label="Open menu" data-ico="menu"></button>
+      <div class="crumbs" id="crumbs">Dashboard</div>
+      <div class="top-actions">
+        <button class="btn ghost sm" data-go="upload"><span data-ico="upload"></span>Add</button>
+        <button class="btn sm" data-go="ask"><span data-ico="spark"></span>Ask AI</button>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+
+      <!-- DASHBOARD -->
+      <section id="view-home" class="view on">
+        <div class="hero">
+          <div class="hero-copy">
+            <p class="hello" id="hello"></p>
+            <h1>Read less. Understand more.</h1>
+            <p class="sub">Ask your whole library a question. Every answer cites the paper and page it came from, so you can check it in one click.</p>
+            <form id="heroForm" class="askbar"><span data-ico="search"></span><input id="heroQ" placeholder="Which papers use transformers, and what results did they report?" aria-label="Question" autocomplete="off">
+              <button class="btn gold" type="submit">Ask</button></form>
+            <div class="chips ex" id="examples"></div>
+          </div>
+          <div class="hero-art" aria-hidden="true"><div class="orbit o1"></div><div class="orbit o2"></div><div class="core"></div><i class="sat s1"></i><i class="sat s2"></i><i class="sat s3"></i></div>
+        </div>
+
+        <div class="stats" id="homeStats"></div>
+
+        <div class="grid3">
+          <div class="panel"><div class="ph-row"><h2>Reading progress</h2></div><div id="donut"></div></div>
+          <div class="panel"><div class="ph-row"><h2>Papers by year</h2></div><div id="years"></div></div>
+          <div class="panel"><div class="ph-row"><h2>Study types</h2></div><div id="types"></div></div>
+        </div>
+        <div class="two">
+          <div class="panel"><div class="ph-row"><h2>Topics across your library</h2><button class="btn ghost sm" data-go="map">Open map</button></div><div id="cloud" class="cloud"></div></div>
+          <div class="panel"><div class="ph-row"><h2>Recently added</h2><button class="btn ghost sm" data-go="board">Board</button></div><div id="recent" class="mini"></div></div>
+        </div>
+        <div class="panel"><div class="ph-row"><h2>Pick up where you left off</h2><button class="btn ghost sm" data-go="library">See all</button></div><div id="viewed" class="mini"></div></div>
+      </section>
+
+      <!-- LIBRARY -->
+      <section id="view-library" class="view">
+        <header class="head"><div><h1>Your library</h1><p class="lede" id="libInfo"></p></div>
+          <div class="head-tools"><div class="search-in"><span data-ico="search"></span><input id="filter" type="search" placeholder="Filter by title, author, tag or keyword" aria-label="Filter"></div>
+          <div class="seg icons" id="layoutSeg"><button class="on" data-l="grid" aria-label="Grid view" data-ico="grid"></button><button data-l="list" aria-label="List view" data-ico="list"></button></div></div></header>
+        <div class="toolbar">
+          <div class="seg" id="statusSeg"><button class="on" data-s="">All</button><button data-s="to read">To read</button><button data-s="reading">Reading</button><button data-s="done">Done</button></div>
+          <label class="chk"><input type="checkbox" id="starOnly"> Starred</label>
+          <select id="sort" aria-label="Sort"><option value="new">Newest added</option><option value="year">Year, newest first</option><option value="yearAsc">Year, oldest first</option><option value="title">Title A to Z</option><option value="star">Starred first</option><option value="long">Longest first</option></select>
+          <select id="typeF" aria-label="Study type"><option value="">All study types</option></select>
+          <button class="btn ghost sm" id="selAllVis">Select visible</button>
+          <a class="btn ghost sm" href="/api/library.csv"><span data-ico="download"></span>CSV</a>
+        </div>
+        <div class="chips tagbar" id="tagBar"></div>
+        <div id="list" class="list grid"></div>
+      </section>
+
+      <!-- READING BOARD -->
+      <section id="view-board" class="view">
+        <header class="head"><div><h1>Reading board</h1><p class="lede">Drag a paper between columns to update its reading status.</p></div></header>
+        <div class="board" id="boardCols"></div>
+      </section>
+
+      <!-- KNOWLEDGE MAP -->
+      <section id="view-map" class="view">
+        <header class="head"><div><h1>Knowledge map</h1><p class="lede">Papers that share topics sit close together. Click a paper to open it, or a topic to filter your library.</p></div>
+          <div class="seg" id="mapSeg"><button class="on" data-m="papers">Papers</button><button data-m="topics">Topics</button></div></header>
+        <div class="panel mapwrap"><svg id="mapSvg" viewBox="0 0 900 540" role="img" aria-label="Network of papers and shared topics"></svg><div id="mapTip" class="maptip" hidden></div></div>
+        <div class="panel"><h2>Most shared topics</h2><div id="mapTopics" class="chips"></div></div>
+      </section>
+
+      <!-- ASK -->
+      <section id="view-ask" class="view">
+        <header class="head"><div><h1>Ask your papers</h1><p class="lede">Retrieval-augmented answers with page-level citations.</p></div>
+          <div class="head-tools"><button class="btn ghost sm" id="exportChat"><span data-ico="download"></span>Export chat</button><button class="btn ghost sm" id="clearChats"><span data-ico="trash"></span>Clear</button></div></header>
+        <div class="panel scope"><span id="scopeLine"></span><button class="btn ghost sm" id="scopeBtn">Choose papers</button></div>
+        <div id="askPicker" class="panel" hidden></div>
+        <div class="seg" id="modeSeg"><button class="on" data-m="answer">Answer with citations</button><button data-m="passages">Find passages</button></div>
+        <div id="askEmpty" class="suggest"></div>
+        <div id="thread" class="thread"></div>
+        <form id="askForm" class="askbar sticky"><span data-ico="chat"></span><input id="askQ" placeholder="Ask a question about the selected papers" aria-label="Question" autocomplete="off">
+          <button class="btn gold" type="submit">Ask</button></form>
+      </section>
+
+      <!-- COMPARE -->
+      <section id="view-compare" class="view">
+        <header class="head"><div><h1>Compare papers</h1><p class="lede">Similarity heatmap, side-by-side methods and an AI comparison.</p></div></header>
+        <div class="panel"><h2>Choose 2 to 5 papers</h2><div id="cmpPicker"></div><div class="row"><button class="btn" id="cmpGo"><span data-ico="cols"></span>Compare</button></div></div>
+        <div id="cmpOut"></div>
+      </section>
+
+      <!-- REVIEW -->
+      <section id="view-review" class="view">
+        <header class="head"><div><h1>Literature review</h1><p class="lede">Draft a review from the papers you choose. Export to Word or Markdown.</p></div></header>
+        <div class="panel"><h2>Topic and papers</h2>
+          <input id="revTopic" class="full" placeholder="Review topic, for example: deep learning in drug discovery" aria-label="Review topic">
+          <div id="revPicker"></div><div class="row"><button class="btn" id="revGo"><span data-ico="doc"></span>Write review</button></div></div>
+        <div id="revOut"></div>
+      </section>
+
+      <!-- CITATIONS -->
+      <section id="view-cite" class="view">
+        <header class="head"><div><h1>Citation manager</h1><p class="lede">Generate APA or BibTeX references for the papers you select.</p></div></header>
+        <div class="panel"><div class="seg" id="citeFmt"><button class="on" data-f="apa">APA</button><button data-f="bibtex">BibTeX</button></div>
+          <div id="citePicker"></div>
+          <div class="row"><button class="btn" id="citeGo"><span data-ico="quote"></span>Generate</button><button class="btn ghost" id="citeCopy">Copy</button><a class="btn ghost" href="/api/cite-all?fmt=bibtex">All as .bib</a><a class="btn ghost" href="/api/cite-all?fmt=apa">All as APA</a></div>
+          <textarea id="citeOut" class="mono" placeholder="Your references appear here" readonly></textarea></div>
+      </section>
+
+      <!-- NOTES -->
+      <section id="view-notes" class="view">
+        <header class="head"><div><h1>All notes</h1><p class="lede">Every note you wrote across your papers, in one place.</p></div>
+          <div class="head-tools"><div class="search-in"><span data-ico="search"></span><input id="noteFilter" type="search" placeholder="Search notes" aria-label="Search notes"></div><button class="btn ghost sm" id="notesExport"><span data-ico="download"></span>Export .md</button></div></header>
+        <div id="notesList" class="list"></div>
+      </section>
+
+      <!-- UPLOAD -->
+      <section id="view-upload" class="view">
+        <header class="head"><div><h1>Add papers</h1><p class="lede">PDFs are read, split into passages and indexed for search.</p></div></header>
+        <label id="drop" class="drop" tabindex="0"><input id="file" type="file" accept="application/pdf" multiple hidden>
+          <span class="drop-ic" data-ico="upload"></span><strong>Drop PDF files here</strong><span>or click to choose. You can add several at once.</span></label>
+        <div id="uploadLog" class="log"></div>
+      </section>
+
+      <!-- DISCOVER -->
+      <section id="view-discover" class="view">
+        <header class="head"><div><h1>Find papers</h1><p class="lede">Search arXiv and OpenAlex, then add open-access PDFs in one click.</p></div></header>
+        <form id="searchForm" class="search"><div class="search-in grow"><span data-ico="search"></span><input id="q" placeholder="Topic or title, for example: graph neural networks" required aria-label="Search topic"></div>
+          <select id="src" aria-label="Source"><option value="arxiv">arXiv</option><option value="openalex">OpenAlex (open access)</option></select>
+          <button class="btn" type="submit">Search</button></form>
+        <div class="chips ex2" id="recentSearch"></div>
+        <div class="bar" id="resultBar" hidden><span id="resultInfo"></span><button class="btn ghost" id="importAll">Add all with PDF</button></div>
+        <div id="results" class="list"></div>
+      </section>
+
+      <!-- PIPELINE -->
+      <section id="view-pipeline" class="view">
+        <header class="head"><div><h1>How Paperlens works</h1><p class="lede">Six AI building blocks, each with a live status on your machine.</p></div></header>
+        <div class="flow" id="flow"></div>
+        <div class="panel"><h2>Pipeline</h2><div class="pipe" id="pipe"></div></div>
+      </section>
+
+      <!-- PAPER -->
+      <section id="view-paper" class="view"><button class="back" id="back"><span data-ico="back"></span>Back to library</button><div id="paper"></div></section>
+    </main>
+  </div>
+</div>
+
+<!-- overlays -->
+<div id="scrim" class="scrim" hidden></div>
+<aside id="settings" class="drawer" hidden aria-label="Settings">
+  <div class="drawer-h"><h2>Appearance</h2><button class="iconbtn" id="setClose" aria-label="Close settings" data-ico="x"></button></div>
+  <div class="field"><label>Theme</label><div class="seg" id="modeSeg3"><button data-v="light">Light</button><button data-v="dark">Dark</button><button data-v="auto">Auto</button></div></div>
+  <div class="field"><label>Accent colour</label><div class="swatches" id="accents"></div></div>
+  <div class="field"><label>Text size <span id="fsVal"></span></label><input type="range" id="fs" min="13" max="19" step="1"></div>
+  <div class="field"><label>Density</label><div class="seg" id="densSeg"><button data-v="comfy">Comfortable</button><button data-v="compact">Compact</button></div></div>
+  <div class="field"><label>Data</label><div class="row"><button class="btn ghost sm" id="reindexBtn">Re-index library</button><button class="btn ghost sm" id="resetPrefs">Reset appearance</button></div></div>
+</aside>
+
+<div id="cmdk" class="cmdk" hidden role="dialog" aria-label="Command palette">
+  <div class="cmdk-box"><div class="cmdk-in"><span data-ico="search"></span><input id="cmdkInput" placeholder="Type a command or search papers..." autocomplete="off" aria-label="Command"><kbd>Esc</kbd></div><div id="cmdkList" class="cmdk-list" role="listbox"></div></div>
+</div>
+<div id="keys" class="modal" hidden role="dialog" aria-label="Keyboard shortcuts">
+  <div class="modal-box"><div class="drawer-h"><h2>Keyboard shortcuts</h2><button class="iconbtn" id="keysClose" aria-label="Close" data-ico="x"></button></div>
+    <div class="kgrid"><span>Command palette</span><kbd>Ctrl K</kbd><span>Go to dashboard</span><kbd>g h</kbd><span>Go to library</span><kbd>g l</kbd><span>Ask your papers</span><kbd>g a</kbd><span>Add papers</span><kbd>g u</kbd><span>Toggle theme</span><kbd>t</kbd><span>This help</span><kbd>?</kbd></div></div>
+</div>
+<div id="selbar" class="selbar" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
